@@ -132,12 +132,19 @@ export class AccountController {
     @Param('id') accountId: number,
     @Query() query: StatementQueryDto,
   ) {
-    const startDate = query.from ? new Date(query.from) : undefined;
-    const endDate = query.to ? new Date(query.to) : undefined;
+    const startDate = new Date(query.from);
+    const endDate = new Date(query.to);
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const type = query.type;
+
     const statement = await this.accountService.getStatement(
       accountId,
       startDate,
       endDate,
+      page,
+      limit,
+      type,
     );
     return {
       success: true,

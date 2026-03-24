@@ -3,6 +3,7 @@
 This folder contains the application's feature modules.
 
 Each module should encapsulate:
+
 - Controllers for handling HTTP requests
 - Services for business logic
 - DTOs for data validation
@@ -13,17 +14,23 @@ Follow NestJS modular architecture principles.
 ## Current Modules
 
 ### Person Module
+
 Contains the `PersonEntity` representing individuals.
+
 - Location: `src/modules/person/`
 - Entity: `person.entity.ts`
 
 ### Account Module
+
 Contains the `AccountEntity` representing bank accounts.
+
 - Location: `src/modules/account/`
 - Entity: `account.entity.ts`
 
 ### Transaction Module
+
 Contains the `TransactionEntity` representing financial transactions.
+
 - Location: `src/modules/transaction/`
 - Entity: `transaction.entity.ts`
 

@@ -4,6 +4,7 @@ import { AccountEntity } from '../../modules/account/account.entity';
 import { TransactionEntity } from '../../modules/transaction/transaction.entity';
 import * as dotenv from 'dotenv';
 import { join } from 'path';
+import { personsData } from 'src/common';
 
 dotenv.config({ path: join(__dirname, '../../../.env') });
 
@@ -24,47 +25,52 @@ async function seed(): Promise<void> {
 
   try {
     await AppDataSource.initialize();
-    console.log('✓ Database connected\n');
+    console.log('Database connected\n');
 
     const personRepository = AppDataSource.getRepository(PersonEntity);
     const accountRepository = AppDataSource.getRepository(AccountEntity);
-    const transactionRepository = AppDataSource.getRepository(TransactionEntity);
+    const transactionRepository =
+      AppDataSource.getRepository(TransactionEntity);
 
-    const existingPerson = await personRepository.findOne({
-      where: { document: '12345678900' },
-    });
+    console.log('Creating persons...');
 
-    let person: PersonEntity;
 
-    if (existingPerson) {
-      console.log('Person already exists. Using existing person.');
-      person = existingPerson;
-    } else {
-      console.log('Creating person...');
-      person = personRepository.create({
-        name: 'John Doe',
-        document: '12345678900',
-        birthDate: new Date('1990-01-15'),
+
+    const persons: PersonEntity[] = [];
+
+    for (const personData of personsData) {
+      const existing = await personRepository.findOne({
+        where: { document: personData.document },
       });
-      person = await personRepository.save(person);
-      console.log(`✓ Person created: ${person.name} (ID: ${person.personId})`);
+
+      if (existing) {
+        console.log(
+          `Person already exists: ${existing.name} (ID: ${existing.personId})`,
+        );
+        persons.push(existing);
+      } else {
+        const person = personRepository.create(personData);
+        const saved = await personRepository.save(person);
+        console.log(`Person created: ${saved.name} (ID: ${saved.personId})`);
+        persons.push(saved);
+      }
     }
 
-    console.log('\nCreating account...');
+    console.log('\nCreating account for John Doe...');
     const account = accountRepository.create({
-      personId: person.personId,
+      personId: persons[0].personId,
       balance: '0.00',
       dailyWithdrawalLimit: '1000.00',
-      accountType: 'checking',
+      accountType: 1,
       activeFlag: true,
     });
     const savedAccount = await accountRepository.save(account);
-    console.log(`✓ Account created: ${savedAccount.accountType} (ID: ${savedAccount.accountId})`);
+    console.log(` Account created: Checking (ID: ${savedAccount.accountId})`);
     console.log(`  Balance: $${savedAccount.balance}`);
     console.log(`  Daily Limit: $${savedAccount.dailyWithdrawalLimit}`);
 
     console.log('\nCreating transactions...');
-    
+
     const deposit1 = transactionRepository.create({
       accountId: savedAccount.accountId,
       value: '1000.00',
@@ -79,7 +85,7 @@ async function seed(): Promise<void> {
       value: '-250.50',
     });
     await transactionRepository.save(withdrawal1);
-    console.log('✓ Transaction 2: Withdrawal -$250.50');
+    console.log(' Transaction 2: Withdrawal -$250.50');
 
     await new Promise((resolve) => setTimeout(resolve, 100));
 
@@ -88,7 +94,7 @@ async function seed(): Promise<void> {
       value: '500.00',
     });
     await transactionRepository.save(deposit2);
-    console.log('✓ Transaction 3: Deposit +$500.00');
+    console.log('Transaction 3: Deposit +$500.00');
 
     await new Promise((resolve) => setTimeout(resolve, 100));
 
@@ -97,12 +103,8 @@ async function seed(): Promise<void> {
       value: '-100.00',
     });
     await transactionRepository.save(withdrawal2);
-    console.log('✓ Transaction 4: Withdrawal -$100.00');
+    console.log(' Transaction 4: Withdrawal -$100.00');
 
-    const finalAccount = await accountRepository.findOne({
-      where: { accountId: savedAccount.accountId },
-    });
-    const finalBalance = finalAccount ? parseFloat(finalAccount.balance) : 0;
     const expectedBalance = 1000.0 - 250.5 + 500.0 - 100.0;
 
     await accountRepository.update(savedAccount.accountId, {
@@ -113,8 +115,8 @@ async function seed(): Promise<void> {
 
     console.log('\nDatabase seeding completed successfully!\n');
     console.log('Summary:');
-    console.log(`  Person: ${person.name} (${person.document})`);
-    console.log(`  Person ID: ${person.personId}`);
+    console.log(`  Persons: ${persons.length}`);
+    persons.forEach((p) => console.log(`    - ${p.name} (ID: ${p.personId})`));
     console.log(`  Account ID: ${savedAccount.accountId}`);
     console.log(`  Transactions: 4 (2 deposits, 2 withdrawals)`);
     console.log(`  Final Balance: $${expectedBalance.toFixed(2)}`);

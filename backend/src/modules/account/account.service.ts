@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource, Between } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { AccountEntity } from './account.entity';
 import { TransactionEntity } from '../transaction/transaction.entity';
 
@@ -25,7 +25,7 @@ export class AccountService {
   async createAccount(
     personId: number,
     dailyWithdrawalLimit: number,
-    accountType: string,
+    accountType: number,
   ): Promise<AccountEntity> {
     const account = this.accountRepository.create({
       personId,
@@ -158,12 +158,18 @@ export class AccountService {
    */
   async getStatement(
     accountId: number,
-    startDate?: Date,
-    endDate?: Date,
+    startDate: Date,
+    endDate: Date,
+    page: number = 1,
+    limit: number = 10,
+    type?: 'deposit' | 'withdrawal',
   ): Promise<{
     accountId: number;
     balance: string;
     transactions: TransactionEntity[];
+    total: number;
+    page: number;
+    limit: number;
   }> {
     const account = await this.accountRepository.findOne({
       where: { accountId },
@@ -171,25 +177,43 @@ export class AccountService {
     if (!account) {
       throw new NotFoundException('Account not found');
     }
-    const whereCondition: { accountId: number; transactionDate?: any } = {
-      accountId,
-    };
-    if (startDate && endDate) {
-      if (startDate > endDate) {
-        [startDate, endDate] = [endDate, startDate];
-      }
-      whereCondition.transactionDate = Between(startDate, endDate);
+
+    const transactionRepo = this.dataSource.getRepository(TransactionEntity);
+    const queryBuilder = transactionRepo
+      .createQueryBuilder('transaction')
+      .where('transaction.accountId = :accountId', { accountId });
+
+    if (startDate > endDate) {
+      [startDate, endDate] = [endDate, startDate];
     }
-    const transactions = await this.dataSource
-      .getRepository(TransactionEntity)
-      .find({
-        where: whereCondition,
-        order: { transactionDate: 'DESC' },
-      });
+    queryBuilder.andWhere(
+      'transaction.transactionDate BETWEEN :startDate AND :endDate',
+      { startDate, endDate },
+    );
+
+    if (type) {
+      if (type === 'deposit') {
+        queryBuilder.andWhere('transaction.value >= 0');
+      } else if (type === 'withdrawal') {
+        queryBuilder.andWhere('transaction.value < 0');
+      }
+    }
+
+    const total = await queryBuilder.getCount();
+
+    const transactions = await queryBuilder
+      .orderBy('transaction.transactionDate', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getMany();
+
     return {
       accountId: account.accountId,
       balance: account.balance,
       transactions,
+      total,
+      page,
+      limit,
     };
   }
 

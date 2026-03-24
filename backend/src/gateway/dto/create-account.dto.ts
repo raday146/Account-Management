@@ -1,9 +1,4 @@
-import { IsNumber, IsEnum, Min, IsInt } from 'class-validator';
-
-export enum AccountType {
-  CHECKING = 'checking',
-  SAVINGS = 'savings',
-}
+import { IsNumber, IsInt, Min } from 'class-validator';
 
 export class CreateAccountDto {
   @IsInt()
@@ -13,6 +8,6 @@ export class CreateAccountDto {
   @Min(0)
   dailyWithdrawalLimit: number;
 
-  @IsEnum(AccountType)
-  accountType: AccountType;
+  @IsInt()
+  accountType: number;
 }

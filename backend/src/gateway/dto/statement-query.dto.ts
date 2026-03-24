@@ -1,11 +1,26 @@
-import { IsDateString, IsOptional } from 'class-validator';
+import { IsDateString, IsOptional, IsInt, Min, IsIn } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class StatementQueryDto {
-  @IsOptional()
   @IsDateString()
-  from?: string;
+  from: string;
+
+  @IsDateString()
+  to: string;
 
   @IsOptional()
-  @IsDateString()
-  to?: string;
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  limit?: number;
+
+  @IsOptional()
+  @IsIn(['deposit', 'withdrawal'])
+  type?: 'deposit' | 'withdrawal';
 }

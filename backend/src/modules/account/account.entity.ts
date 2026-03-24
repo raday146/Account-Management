@@ -27,8 +27,8 @@ export class AccountEntity {
   @Column({ type: 'boolean', default: true })
   activeFlag: boolean;
 
-  @Column({ type: 'varchar', length: 50 })
-  accountType: string;
+  @Column({ type: 'int', default: 1 })
+  accountType: number;
 
   @CreateDateColumn({ type: 'timestamp' })
   createDate: Date;

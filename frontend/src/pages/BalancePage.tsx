@@ -1,11 +1,11 @@
 import { useState, FormEvent } from 'react';
-import { accountService } from '../services/accountService';
+import { Account, accountService } from '../services/accountService';
 
 export function BalancePage() {
-  const [accountId, setAccountId] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [result, setResult] = useState<any>(null);
+  const [accountId, setAccountId] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] =  useState<string>('');
+  const [result, setResult] = useState<Account | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -16,8 +16,8 @@ export function BalancePage() {
     try {
       const balance = await accountService.getBalance(parseInt(accountId));
       setResult(balance);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to get balance');
     } finally {
       setLoading(false);
     }

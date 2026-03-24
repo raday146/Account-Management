@@ -19,8 +19,8 @@ export function BlockAccountPage() {
       const account = await accountService.blockAccount(parseInt(accountId));
       setSuccess('Account blocked successfully!');
       setResult(account);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to block account');
     } finally {
       setLoading(false);
     }

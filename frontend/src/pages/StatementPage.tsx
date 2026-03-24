@@ -1,11 +1,12 @@
 import { useState, FormEvent } from 'react';
 import { accountService, Statement } from '../services/accountService';
+import { TransactionFilterType } from '../types/core';
 
 export function StatementPage() {
   const [accountId, setAccountId] = useState<string>('');
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'deposit' | 'withdrawal'>('all');
+  const [typeFilter, setTypeFilter] = useState<TransactionFilterType>('all');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
   const [loading, setLoading] = useState<boolean>(false);
@@ -51,8 +52,8 @@ export function StatementPage() {
       );
       setResult(statement);
       setCurrentPage(page);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to get statement');
       setResult(null);
     } finally {
       setLoading(false);
@@ -140,7 +141,7 @@ export function StatementPage() {
             <select
               id="typeFilter"
               value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value as 'all' | 'deposit' | 'withdrawal')}
+              onChange={(e) => setTypeFilter(e.target.value as TransactionFilterType)}
             >
               <option value="all">All</option>
               <option value="deposit">Deposits</option>

@@ -1,12 +1,14 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { Account, accountService, Person } from '../services/accountService';
+import { AccountType } from '../types/core';
 
-const ACCOUNT_TYPE_MAP = {
+
+const ACCOUNT_TYPE_MAP: Record<AccountType, number> = {
   checking: 1,
   savings: 2,
 };
 
-const ACCOUNT_TYPE_LABELS = {
+const ACCOUNT_TYPE_LABELS: Record<number, string> = {
   1: 'Checking',
   2: 'Savings',
 };
@@ -15,7 +17,7 @@ export function CreateAccountPage() {
   const [persons, setPersons] = useState<Person[]>([]);
   const [selectedPersonId, setSelectedPersonId] = useState<number>(0);
   const [dailyLimit, setDailyLimit] = useState<string>('1000');
-  const [accountType, setAccountType] = useState<'checking' | 'savings'>('checking');
+  const [accountType, setAccountType] = useState<AccountType>('checking');
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingPersons, setLoadingPersons] = useState(true);
   const [error, setError] = useState<string>('');
@@ -32,7 +34,7 @@ export function CreateAccountPage() {
         } else {
           setError('No persons found. Please run the seed script first.');
         }
-      } catch (err: any) {
+      } catch (error) {
         setError('Failed to load person data. Please run the seed script first.');
       } finally {
         setLoadingPersons(false);
@@ -122,7 +124,7 @@ export function CreateAccountPage() {
           <select
             id="accountType"
             value={accountType}
-            onChange={(e) => setAccountType(e.target.value as 'checking' | 'savings')}
+            onChange={(e) => setAccountType(e.target.value as AccountType)}
           >
             <option value="checking">Checking</option>
             <option value="savings">Savings</option>

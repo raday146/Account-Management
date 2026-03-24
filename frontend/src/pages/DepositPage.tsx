@@ -23,8 +23,8 @@ export function DepositPage() {
       setSuccess('Deposit successful!');
       setResult(account);
       setAmount('');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to deposit');
     } finally {
       setLoading(false);
     }

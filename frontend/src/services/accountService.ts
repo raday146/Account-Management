@@ -1,3 +1,5 @@
+import type { TransactionType } from '../types/core';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export interface CreateAccountRequest {
@@ -128,7 +130,7 @@ export const accountService = {
     to?: string,
     page?: number,
     limit?: number,
-    type?: 'deposit' | 'withdrawal',
+    type?: TransactionType,
   ): Promise<Statement> {
     const params = new URLSearchParams();
     if (from) params.append('from', from);

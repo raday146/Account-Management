@@ -1,13 +1,13 @@
 import { useState, FormEvent } from 'react';
-import { accountService } from '../services/accountService';
+import { Account, accountService } from '../services/accountService';
 
 export function WithdrawPage() {
-  const [accountId, setAccountId] = useState('');
-  const [amount, setAmount] = useState('');
+  const [accountId, setAccountId] = useState<string>('');
+  const [amount, setAmount] = useState<string>('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
+  const [result, setResult] = useState<Account | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -23,8 +23,8 @@ export function WithdrawPage() {
       setSuccess('Withdrawal successful!');
       setResult(account);
       setAmount('');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to withdraw');
     } finally {
       setLoading(false);
     }

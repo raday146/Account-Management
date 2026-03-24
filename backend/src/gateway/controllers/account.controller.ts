@@ -133,7 +133,11 @@ export class AccountController {
     @Query() query: StatementQueryDto,
   ) {
     const startDate = new Date(query.from);
+    startDate.setHours(0, 0, 0, 0);
+
     const endDate = new Date(query.to);
+    endDate.setHours(23, 59, 59, 999);
+
     const page = query.page || 1;
     const limit = query.limit || 10;
     const type = query.type;

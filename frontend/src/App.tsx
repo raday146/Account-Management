@@ -6,76 +6,50 @@ import { WithdrawPage } from './pages/WithdrawPage';
 import { BalancePage } from './pages/BalancePage';
 import { BlockAccountPage } from './pages/BlockAccountPage';
 import { StatementPage } from './pages/StatementPage';
+import { Page } from './types/core';
 
-type Page = 'create' | 'deposit' | 'withdraw' | 'balance' | 'block' | 'statement';
+interface PageConfig {
+  id: Page;
+  label: string;
+  component: React.ComponentType;
+}
+
+const PAGES: PageConfig[] = [
+  { id: 'create', label: 'Create Account', component: CreateAccountPage },
+  { id: 'deposit', label: 'Deposit', component: DepositPage },
+  { id: 'withdraw', label: 'Withdraw', component: WithdrawPage },
+  { id: 'balance', label: 'Balance', component: BalancePage },
+  { id: 'block', label: 'Block Account', component: BlockAccountPage },
+  { id: 'statement', label: 'Statement', component: StatementPage },
+];
+
+const DEFAULT_PAGE: Page = 'balance';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('balance');
+  const [currentPage, setCurrentPage] = useState<Page>(DEFAULT_PAGE);
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'create':
-        return <CreateAccountPage />;
-      case 'deposit':
-        return <DepositPage />;
-      case 'withdraw':
-        return <WithdrawPage />;
-      case 'balance':
-        return <BalancePage />;
-      case 'block':
-        return <BlockAccountPage />;
-      case 'statement':
-        return <StatementPage />;
-      default:
-        return <BalancePage />;
-    }
-  };
+  const CurrentPageComponent = PAGES.find(page => page.id === currentPage)?.component || BalancePage;
 
   return (
     <div className="container">
       <header className="header">
         <h1>Account Management System</h1>
         <nav className="nav">
-          <button
-            className={`nav-button ${currentPage === 'create' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('create')}
-          >
-            Create Account
-          </button>
-          <button
-            className={`nav-button ${currentPage === 'deposit' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('deposit')}
-          >
-            Deposit
-          </button>
-          <button
-            className={`nav-button ${currentPage === 'withdraw' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('withdraw')}
-          >
-            Withdraw
-          </button>
-          <button
-            className={`nav-button ${currentPage === 'balance' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('balance')}
-          >
-            Balance
-          </button>
-          <button
-            className={`nav-button ${currentPage === 'block' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('block')}
-          >
-            Block Account
-          </button>
-          <button
-            className={`nav-button ${currentPage === 'statement' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('statement')}
-          >
-            Statement
-          </button>
+          {PAGES.map(page => (
+            <button
+              key={page.id}
+              className={`nav-button ${currentPage === page.id ? 'active' : ''}`}
+              onClick={() => setCurrentPage(page.id)}
+            >
+              {page.label}
+            </button>
+          ))}
         </nav>
       </header>
 
-      <main>{renderPage()}</main>
+      <main>
+        <CurrentPageComponent />
+      </main>
     </div>
   );
 }

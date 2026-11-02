@@ -13,6 +13,13 @@ build/
 .env
 .env.local
 .env.*.local
+.env.*
+!.env.example
+
+# Yarn cache / install state
+**/.yarn/*
+!**/.yarn/releases
+!**/.yarn/plugins
 # env files
 backend/.env
 frontend/.env
@@ -39,3 +46,7 @@ coverage/
 *.db
 *.sqlite
 postgres_data/
+
+# Local-only (not tracked)
+.cursor/
+eslint.config.mjs

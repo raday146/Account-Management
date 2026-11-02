@@ -48,14 +48,27 @@ git clone git@github.com:raday146/Account-Management.git
 cd Account-Management
 ```
 
-### 2. Start the system
+### 2. Configure your environment
+
+> ⚠️ **No credentials are shipped with this repo.** You must supply your own local
+> values before running anything. `.env` files are git-ignored — never commit them.
 
 ```bash
-docker-compose up -d
-
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
 
-### 3. Seed the database
+Edit both files and replace every `your_...` placeholder with your own values
+(choose any database user/password/name you like — Docker creates the database
+with whatever you set).
+
+### 3. Start the system
+
+```bash
+docker-compose --env-file backend/.env up -d
+```
+
+### 4. Seed the database
 
 ⚠️ Run this before using the system to create initial data (persons, accounts, and transactions).
 
@@ -64,7 +77,7 @@ cd backend
 npm run seed
 ```
 
-#### 4. Open the application
+### 5. Open the application
 
 - Frontend: <http://localhost:5173>
 - Backend: <http://localhost:3000>

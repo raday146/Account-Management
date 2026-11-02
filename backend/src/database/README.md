@@ -22,9 +22,9 @@ Required database environment variables:
 
 - `DB_HOST` - Database host (default: localhost)
 - `DB_PORT` - Database port (default: 5432)
-- `DB_USER` - Database user (default: postgres)
+- `DB_USER` - Database user (required, no default)
 - `DB_PASSWORD` - Database password
-- `DB_NAME` - Database name (default: account_management)
+- `DB_NAME` - Database name (required, no default)
 
 ## Docker Setup
 

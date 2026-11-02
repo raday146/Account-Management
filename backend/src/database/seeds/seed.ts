@@ -9,15 +9,23 @@ import { personsData } from 'src/common';
 dotenv.config({ path: join(__dirname, '../../../.env') });
 
 async function seed(): Promise<void> {
+  for (const key of ['DB_USER', 'DB_PASSWORD', 'DB_NAME']) {
+    if (!process.env[key]) {
+      throw new Error(
+        `${key} is not set. Copy backend/.env.example to backend/.env and fill it in.`,
+      );
+    }
+  }
+
   console.log('Starting database seed...\n');
 
   const AppDataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
-    username: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_NAME || 'account_management',
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     entities: [PersonEntity, AccountEntity, TransactionEntity],
     synchronize: true,
     logging: false,
@@ -33,8 +41,6 @@ async function seed(): Promise<void> {
       AppDataSource.getRepository(TransactionEntity);
 
     console.log('Creating persons...');
-
-
 
     const persons: PersonEntity[] = [];
 
